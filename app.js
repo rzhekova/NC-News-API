@@ -17,15 +17,23 @@ mongoose.connect(DB_URL).then(() => {
 app.get("/", (req, res) => {
   res.status(200).send("Welcome to my home-page...");
 });
-
 app.use("/api", apiRouter);
 
-app.get("/*", (req, res) => {
-  res.status(404).send({ msg: "ERROR: Page not found" });
+// error handler for 404s
+app.use((err, req, res, next) => {
+  err.status ? res.status(404).send(err.message) : next(err);
 });
 
+// error handler for 400s/500s
 app.use((err, req, res, next) => {
-  console.log(err, "***********");
+  if (err.name === "CastError") {
+    res.status(400).send({ message: `Bad request : ${err.value} is invalid` });
+  }
+  if (err.name === "ValidationError") {
+    res
+      .status(400)
+      .send({ message: "Bad request : required fields are missing" });
+  }
   res.status(500).send({ msg: "Internal server error" });
 });
 

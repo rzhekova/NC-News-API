@@ -44,9 +44,6 @@ const seedDB = ({ topicData, commentData, userData, articleData }) => {
         articleDocs,
         Comment.insertMany(formattedComments)
       ]);
-    })
-    .then(() => {
-      console.log("seeded into topics, users, movies");
     });
 };
 
