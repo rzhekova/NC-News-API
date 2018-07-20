@@ -3,7 +3,7 @@ const { Article, Topic } = require("../models");
 const getAllTopics = (req, res, next) => {
   Topic.find({})
     .then(topics => {
-      res.status(200).send({ topics });
+      res.status(200).json({ topics });
     })
     .catch(next);
 };
@@ -15,7 +15,7 @@ const getArticlesByTopic = (req, res, next) => {
     .populate({ path: "created_by", select: "username" })
     .then(articles => {
       if (articles.length > 0) {
-        res.status(200).send({ articles });
+        res.status(200).json({ articles });
       } else
         next({
           status: 404,
@@ -36,7 +36,7 @@ const addArticleToTopic = (req, res, next) => {
       if (topic[0]) {
         return Article.create(newArticle)
           .then(article => {
-            res.status(201).send({ article });
+            res.status(201).json({ article });
           })
           .catch(next);
       } else {

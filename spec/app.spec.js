@@ -6,32 +6,6 @@ const app = require("../app");
 const mongoose = require("mongoose");
 const request = require("supertest")(app);
 
-describe("/", () => {
-  it("responds with 404 when a route is not found", () => {
-    return request.get("/animal").expect(404);
-  });
-  it("responds with 200 when a route is successfully reached", () => {
-    return request.get("/").expect(200);
-  });
-});
-
-describe("/api", () => {
-  // it("responds with 400 when a route is not found", () => {
-  // const badEndpoint = 'animal'
-  //   return request.get(`/api/${badEndpoint}`).expect(400).then(res => {
-  // expect(res.message).to.equal(`Bad request!`)
-  //});
-  // });
-  it("responds with 200 when a route is successfully reached", () => {
-    return request
-      .get("/api")
-      .expect(200)
-      .then(res => {
-        expect(res.body).to.eql({ status: "OK" });
-      });
-  });
-});
-
 let articleDocs;
 let commentDocs;
 let userDocs;
@@ -44,6 +18,25 @@ beforeEach(() => {
 after(() => {
   return mongoose.disconnect();
 });
+describe("/", () => {
+  it("responds with 404 when a route is not found", () => {
+    return request
+      .get("/animal")
+      .expect(404)
+      .then(res => {
+        expect(res.body.message).to.equal("Page not found");
+      });
+  });
+  it("responds with 200 when a route is successfully reached", () => {
+    return request
+      .get("/")
+      .expect(200)
+      .then(res => {
+        expect(res.body.message).to.equal("Welcome to NC News!");
+      });
+  });
+});
+
 describe("/api/topics", () => {
   describe("/", () => {
     it("GET request with 200 and returns all topics", () => {
@@ -92,7 +85,9 @@ describe("/api/topics", () => {
         .get(`/api/topics/${badTopicSlug}/articles`)
         .expect(404)
         .then(res => {
-          expect(res.text).to.equal(`Page not found for ${badTopicSlug}`);
+          expect(res.body.message).to.equal(
+            `Page not found for ${badTopicSlug}`
+          );
         });
     });
     it("POST responds with 201 and returns added article", () => {
@@ -131,7 +126,6 @@ describe("/api/topics", () => {
           );
         });
     });
-    // write 404 for posting the right format article for an invalid slug e.g./api/topics/tom/articles
     it("POST responds with 404 when new article is in valid format but title slug is ivalid", () => {
       const badTopicSlug = "lol";
       const newArticle = {
@@ -144,7 +138,9 @@ describe("/api/topics", () => {
         .send(newArticle)
         .expect(404)
         .then(res => {
-          expect(res.text).to.equal(`Page not found for ${badTopicSlug}`);
+          expect(res.body.message).to.equal(
+            `Page not found for ${badTopicSlug}`
+          );
         });
     });
   });
@@ -212,7 +208,7 @@ describe("/api/articles", () => {
         .get(`/api/articles/${badId}`)
         .expect(404)
         .then(res => {
-          expect(res.text).to.equal(`Page not found for ${badId}`);
+          expect(res.body.message).to.equal(`Page not found for ${badId}`);
         });
     });
     it("PUT responds with 202 and returns the updated article", () => {
@@ -241,7 +237,7 @@ describe("/api/articles", () => {
         .put(`/api/articles/${badId}?vote=down`)
         .expect(404)
         .then(res => {
-          expect(res.text).to.equal(`Page not found for ${badId}`);
+          expect(res.body.message).to.equal(`Page not found for ${badId}`);
         });
     });
   });
@@ -279,7 +275,7 @@ describe("/api/articles", () => {
         .get(`/api/articles/${badId}/comments`)
         .expect(404)
         .then(res => {
-          expect(res.text).to.equal(`Page not found for ${badId}`);
+          expect(res.body.message).to.equal(`Page not found for ${badId}`);
         });
     });
     it("POST responds with 201 and returns added comment", () => {
@@ -293,12 +289,12 @@ describe("/api/articles", () => {
         .send(newComment)
         .expect(201)
         .then(res => {
-          expect(res.body.comment).to.be.an("object");
-          expect(res.body.comment).to.contain.keys(
+          expect(res.body).to.be.an("object");
+          expect(res.body).to.contain.keys(
             "_id",
             "body",
             "belongs_to",
-            "__v",
+            "created_by",
             "votes"
           );
         });
@@ -326,13 +322,15 @@ describe("/api/articles", () => {
         .send(newComment)
         .expect(404)
         .then(res => {
-          expect(res.text).to.equal(`Page not found for ${userDocs[0]._id}`);
+          expect(res.body.message).to.equal(
+            `Page not found for ${userDocs[0]._id}`
+          );
         });
     });
   });
 });
 
-describe("/api/comments", () => {
+describe("/api/comments/:comment_id", () => {
   it("PUT responds with 202 and returns the updated comment", () => {
     const commentId = commentDocs[1]._id;
     return request
@@ -359,7 +357,7 @@ describe("/api/comments", () => {
       .put(`/api/comments/${badId}?vote=down`)
       .expect(404)
       .then(res => {
-        expect(res.text).to.equal(`Page not found for ${badId}`);
+        expect(res.body.message).to.equal(`Page not found for ${badId}`);
       });
   });
   it("DELETE responds with 202 and returns a message", () => {
@@ -390,7 +388,36 @@ describe("/api/comments", () => {
       .delete(`/api/comments/${badId}`)
       .expect(404)
       .then(res => {
-        expect(res.text).to.equal(`Page not found for ${badId}`);
+        expect(res.body.message).to.equal(`Page not found for ${badId}`);
+      });
+  });
+});
+
+describe("/api/users/:username", () => {
+  it("GET responds with 200 and returns user data", () => {
+    const username = userDocs[0].username;
+    return request
+      .get(`/api/users/${username}`)
+      .expect(200)
+      .then(res => {
+        expect(res.body).to.be.an("object");
+        expect(res.body).to.contain.keys(
+          "_id",
+          "name",
+          "username",
+          "avatar_url",
+          "name"
+        );
+        expect(res.body.username).to.equal(username);
+      });
+  });
+  it("GET responds with 404 when username does not exist", () => {
+    const userName = "rosie";
+    return request
+      .get(`/api/users/${userName}`)
+      .expect(404)
+      .then(res => {
+        expect(res.body.message).to.equal(`${userName} does not exist`);
       });
   });
 });

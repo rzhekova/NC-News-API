@@ -15,26 +15,31 @@ mongoose.connect(DB_URL).then(() => {
 });
 
 app.get("/", (req, res) => {
-  res.status(200).send("Welcome to my home-page...");
+  res.status(200).json({ message: "Welcome to NC News!" });
 });
+
 app.use("/api", apiRouter);
 
-// error handler for 404s
+// error handlers for 404s
+app.get("/*", (req, res) => {
+  res.status(404).json({ message: "Page not found" });
+});
+
 app.use((err, req, res, next) => {
-  err.status ? res.status(404).send(err.message) : next(err);
+  err.status ? res.status(404).json({ message: err.message }) : next(err);
 });
 
 // error handler for 400s/500s
 app.use((err, req, res, next) => {
   if (err.name === "CastError") {
-    res.status(400).send({ message: `Bad request : ${err.value} is invalid` });
+    res.status(400).json({ message: `Bad request : ${err.value} is invalid` });
   }
   if (err.name === "ValidationError") {
     res
       .status(400)
-      .send({ message: "Bad request : required fields are missing" });
+      .json({ message: "Bad request : required fields are missing" });
   }
-  res.status(500).send({ msg: "Internal server error" });
+  res.status(500).json({ message: "Internal server error" });
 });
 
 module.exports = app;

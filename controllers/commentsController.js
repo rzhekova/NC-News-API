@@ -3,7 +3,8 @@ const { Comment } = require("../models");
 const updateCommentByIdVote = (req, res, next) => {
   const { comment_id } = req.params;
   const changeVote = req.query.vote;
-  return Comment.findById(comment_id)
+  return Comment.findByIdAndUpdate(comment_id)
+    .populate("created_by")
     .then(comment => {
       if (comment === null) {
         next({
@@ -16,17 +17,18 @@ const updateCommentByIdVote = (req, res, next) => {
       } else if (changeVote === "down") {
         comment.votes--;
       }
-      res.status(202).send({ comment });
+      res.status(202).json({ comment });
     })
     .catch(next);
 };
 
 const deleteCommentById = (req, res, next) => {
   const { comment_id } = req.params;
-  return Comment.remove({ _id: comment_id })
+  return Comment.findByIdAndRemove(comment_id)
+    .populate("created_by")
     .then(comment => {
-      if (comment.n > 0) {
-        res.status(202).send({
+      if (comment !== null) {
+        res.status(202).json({
           message: `Comment ${comment_id} has been successfully deleted`
         });
       } else {
