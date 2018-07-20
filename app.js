@@ -4,11 +4,11 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const apiRouter = require("./routes/api.js");
 app.use(bodyParser.json());
-let DB_URL;
 
-process.env.NODE_ENV === "test"
-  ? (DB_URL = "mongodb://localhost:27017/nc_news_test")
-  : (DB_URL = "mongodb://localhost:27017/nc_news");
+const { DB_URL } =
+  process.env.NODE_ENV === "production"
+    ? process.env
+    : require("./config/config.js");
 
 mongoose.connect(DB_URL).then(() => {
   console.log(`Connected to ${DB_URL}`);

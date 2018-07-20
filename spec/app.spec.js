@@ -151,7 +151,7 @@ describe("/api/topics", () => {
 });
 
 describe("/api/articles", () => {
-  describe("/", () => {
+  xdescribe("/", () => {
     it("GET request with 200 and returns all articles", () => {
       return request
         .get("/api/articles")
@@ -177,7 +177,7 @@ describe("/api/articles", () => {
   });
   describe("/:article_id", () => {
     it("GET responds with 200 and returns an article by its ID", () => {
-      const articleID = articleDocs[0]._id;
+      const articleID = articleDocs[1]._id;
       return request
         .get(`/api/articles/${articleID}`)
         .expect(200)
@@ -210,6 +210,35 @@ describe("/api/articles", () => {
       const badId = userDocs[0]._id;
       return request
         .get(`/api/articles/${badId}`)
+        .expect(404)
+        .then(res => {
+          expect(res.text).to.equal(`Page not found for ${badId}`);
+        });
+    });
+    it("PUT responds with 202 and returns the updated article", () => {
+      const articleID = articleDocs[0]._id;
+      return request
+        .put(`/api/articles/${articleID}?vote=down`)
+        .expect(202)
+        .then(res => {
+          expect(res.body.article.votes).to.equal(-1);
+        });
+    });
+    it("PUT responds with 400 when article_id format is invalid", () => {
+      const wrongFormatId = "blah12345";
+      return request
+        .put(`/api/articles/${wrongFormatId}?vote=down`)
+        .expect(400)
+        .then(res => {
+          expect(res.body.message).to.equal(
+            `Bad request : ${wrongFormatId} is invalid`
+          );
+        });
+    });
+    it("PUT responds with 404 when article_id is incorrect in right format", () => {
+      const badId = userDocs[0]._id;
+      return request
+        .put(`/api/articles/${badId}?vote=down`)
         .expect(404)
         .then(res => {
           expect(res.text).to.equal(`Page not found for ${badId}`);
@@ -301,4 +330,8 @@ describe("/api/articles", () => {
         });
     });
   });
+});
+
+describe.only("/api/comments", () => {
+  it("PUT responds with 202 and returns the updated comment");
 });

@@ -8,13 +8,28 @@ const getAllArticles = (req, res, next) => {
     .catch(next);
 };
 
-const getArticleById = (req, res, next) => {
+const articleById = (req, res, next) => {
   const { article_id } = req.params;
+  const changedVote = req.query.vote;
   return Article.findById(article_id)
     .then(article => {
-      article === null
-        ? next({ status: 404, message: `Page not found for ${article_id}` })
-        : res.status(200).send({ article });
+      if (article === null) {
+        next({
+          status: 404,
+          message: `Page not found for ${article_id}`
+        });
+      }
+      if (article !== null) {
+        const voteBefore = article.votes;
+        if (changedVote === "up") {
+          article.votes++;
+        } else if (changedVote === "down") {
+          article.votes--;
+        }
+        article.votes - voteBefore === 1 || article.votes - voteBefore === -1
+          ? res.status(202).send({ article })
+          : res.status(200).send({ article });
+      }
     })
     .catch(next);
 };
@@ -58,7 +73,7 @@ const addCommentToArticle = (req, res, next) => {
 
 module.exports = {
   getAllArticles,
-  getArticleById,
+  articleById,
   getAllCommentsForSingleArticle,
   addCommentToArticle
 };

@@ -1,8 +1,7 @@
 const app = require("./app.js");
 
-const { PORT = 9090 } = process.env;
+const PORT = process.env.PORT || 9090;
 
-app.listen(9090, err => {
-  if (err) throw err;
-  console.log(`listening on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`server listening on port ${PORT}`);
 });
