@@ -10,7 +10,7 @@ const getAllArticles = (req, res, next) => {
 
 const articleById = (req, res, next) => {
   const { article_id } = req.params;
-  const changedVote = req.query.vote;
+  const changeVote = req.query.vote;
   return Article.findById(article_id)
     .then(article => {
       if (article === null) {
@@ -21,9 +21,9 @@ const articleById = (req, res, next) => {
       }
       if (article !== null) {
         const voteBefore = article.votes;
-        if (changedVote === "up") {
+        if (changeVote === "up") {
           article.votes++;
-        } else if (changedVote === "down") {
+        } else if (changeVote === "down") {
           article.votes--;
         }
         article.votes - voteBefore === 1 || article.votes - voteBefore === -1

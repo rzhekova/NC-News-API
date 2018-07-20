@@ -151,7 +151,7 @@ describe("/api/topics", () => {
 });
 
 describe("/api/articles", () => {
-  xdescribe("/", () => {
+  describe("/", () => {
     it("GET request with 200 and returns all articles", () => {
       return request
         .get("/api/articles")
@@ -235,7 +235,7 @@ describe("/api/articles", () => {
           );
         });
     });
-    it("PUT responds with 404 when article_id is incorrect in right format", () => {
+    it("PUT responds with 404 when article_id is incorrect but in right format", () => {
       const badId = userDocs[0]._id;
       return request
         .put(`/api/articles/${badId}?vote=down`)
@@ -282,7 +282,7 @@ describe("/api/articles", () => {
           expect(res.text).to.equal(`Page not found for ${badId}`);
         });
     });
-    it("POST responds with 200 and returns added comment", () => {
+    it("POST responds with 201 and returns added comment", () => {
       const articleID = articleDocs[1]._id;
       const newComment = {
         body: "a",
@@ -332,6 +332,65 @@ describe("/api/articles", () => {
   });
 });
 
-describe.only("/api/comments", () => {
-  it("PUT responds with 202 and returns the updated comment");
+describe("/api/comments", () => {
+  it("PUT responds with 202 and returns the updated comment", () => {
+    const commentId = commentDocs[1]._id;
+    return request
+      .put(`/api/comments/${commentId}?vote=up`)
+      .expect(202)
+      .then(res => {
+        expect(res.body.comment.votes).to.equal(20);
+      });
+  });
+  it("PUT responds with 400 when comment_id format is invalid", () => {
+    const wrongFormatId = "blah12345";
+    return request
+      .put(`/api/comments/${wrongFormatId}?vote=up`)
+      .expect(400)
+      .then(res => {
+        expect(res.body.message).to.equal(
+          `Bad request : ${wrongFormatId} is invalid`
+        );
+      });
+  });
+  it("PUT responds with 404 when comment_id is incorrect but in right format", () => {
+    const badId = userDocs[0]._id;
+    return request
+      .put(`/api/comments/${badId}?vote=down`)
+      .expect(404)
+      .then(res => {
+        expect(res.text).to.equal(`Page not found for ${badId}`);
+      });
+  });
+  it("DELETE responds with 202 and returns a message", () => {
+    const commentId = commentDocs[1]._id;
+    return request
+      .delete(`/api/comments/${commentId}`)
+      .expect(202)
+      .then(res => {
+        expect(res.body.message).to.equal(
+          `Comment ${commentId} has been successfully deleted`
+        );
+      });
+  });
+  it("DELETE responds with 400 when when comment_id format is invalid", () => {
+    const wrongFormatId = "blah12345";
+    return request
+      .delete(`/api/comments/${wrongFormatId}`)
+      .expect(400)
+      .then(res => {
+        expect(res.body.message).to.equal(
+          `Bad request : ${wrongFormatId} is invalid`
+        );
+      });
+  });
+  it("DELETE responds with 404 when comment_id is incorrect but in right format", () => {
+    const badId = userDocs[0]._id;
+    return request
+      .delete(`/api/comments/${badId}`)
+      .expect(404)
+      .then(res => {
+        expect(res.text).to.equal(`Page not found for ${badId}`);
+      });
+  });
 });
