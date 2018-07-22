@@ -18,7 +18,7 @@
       <code>/api/topics/:topic_id/articles</code>
     </h2>
     <p>Add a new article to a topic. This route requires a JSON body with title and body key value pairs e.g:
-      <code>`{ "title": "new article", "body": "This is my new article content"}`</code>
+      <code>`{ "title": "new article", "body": "This is my new article content" }`</code>
     </p>
 
     <h2>>> GET
@@ -40,12 +40,14 @@
     </h2>
     <p>
       Add a new comment to an article. This route requires a JSON body with body and created_by key value pairs e.g:
-      <code>`{"body": "This is my new comment", "created_by": --MongoId for user--}`</code>
+      <code>`{ "body": "This is my new comment", "created_by": --mongoId for user-- }`</code>
     </p>
 
     <h2>>> PUT
       <code>/api/articles/:article_id</code> </h2>
-    <p> Increment or Decrement the votes of an article by one. This route requires a vote query of 'up' or 'down' e.g: `/api/articles/:article_id?vote=up`</p>
+    <p> Increment or Decrement the votes of an article by one. This route requires a vote query of 'up' or 'down' e.g:
+      <code>`/api/articles/:article_id?vote=up`</code>
+    </p>
 
     <h2>>> PUT
       <code>/api/comments/:comment_id</code> </h2>
@@ -63,7 +65,7 @@
       <code>/api/users/:username</code>
     </h2>
     <p>e.g:
-      <code>`/api/users/rosie`</code> returns a JSON object with the profile data for the specified user.</p>
+      <code>`/api/users/rosie`</code> returns a JSON object with the profile data for the specified user</p>
 
   </body>
 
