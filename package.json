@@ -12,15 +12,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.15.2",
+    "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "mongoose": "^5.0.14"
+    "mongoose": "^5.2.4"
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.0.5",
-    "supertest": "^3.0.0",
-    "nodemon": "^1.17.4"
+    "mocha": "^5.2.0",
+    "supertest": "^3.1.0",
+    "nodemon": "^1.18.3"
   }
 }

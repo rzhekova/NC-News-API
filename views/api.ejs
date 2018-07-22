@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("partials/head.ejs") %>
+
+  <body style="margin-left: 3%">
+    <h2>>> GET
+      <code>/api/topics</code>
+    </h2>
+    <p>Get all the topics</p>
+
+    <h2>>> GET
+      <code>/api/topics/:topic_slug/articles</code>
+    </h2>
+    <p>Return all the articles for a certain topic, e.g:
+      <code>`/api/topics/football/articles</code>`</p>
+
+    <h2>>> POST
+      <code>/api/topics/:topic_id/articles</code>
+    </h2>
+    <p>Add a new article to a topic. This route requires a JSON body with title and body key value pairs e.g:
+      <code>`{ "title": "new article", "body": "This is my new article content"}`</code>
+    </p>
+
+    <h2>>> GET
+      <code>/api/articles</code>
+    </h2>
+    <p>Returns all the articles</p>
+
+    <h2>>> GET
+      <code>/api/articles/:article_id</code>
+    </h2>
+    <p>Get an individual article</p>
+
+    <h2>>> GET
+      <code>/api/articles/:article_id/comments</code> </h2>
+    <p>Get all the comments for a individual article</p>
+
+    <h2>>> POST
+      <code>/api/articles/:article_id/comments</code>
+    </h2>
+    <p>
+      Add a new comment to an article. This route requires a JSON body with body and created_by key value pairs e.g:
+      <code>`{"body": "This is my new comment", "created_by": --MongoId for user--}`</code>
+    </p>
+
+    <h2>>> PUT
+      <code>/api/articles/:article_id</code> </h2>
+    <p> Increment or Decrement the votes of an article by one. This route requires a vote query of 'up' or 'down' e.g: `/api/articles/:article_id?vote=up`</p>
+
+    <h2>>> PUT
+      <code>/api/comments/:comment_id</code> </h2>
+    <p>Increment or Decrement the votes of a comment by one. This route requires a vote query of 'up' or 'down' e.g:
+      <code>`/api/comments/:comment_id?vote=down`</code>
+    </p>
+
+    <h2>>> DELETE
+      <code>/api/comments/:comment_id</code>
+    </h2>
+    <p>Deletes a comment</p>
+
+
+    <h2>>> GET
+      <code>/api/users/:username</code>
+    </h2>
+    <p>e.g:
+      <code>`/api/users/rosie`</code> returns a JSON object with the profile data for the specified user.</p>
+
+  </body>
+
+</html>

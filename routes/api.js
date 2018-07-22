@@ -5,7 +5,7 @@ const commentsRouter = require("./commentsRouter.js");
 const usersRouter = require("./usersRouter.js");
 
 apiRouter.get("/", (req, res) => {
-  res.status(200).json({ status: "OK" });
+  res.status(200).render("api.ejs");
 });
 
 apiRouter.use("/topics", topicsRouter);
