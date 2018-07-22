@@ -5,19 +5,19 @@ const getAllArticles = (req, res, next) => {
     .populate("created_by")
     .lean()
     .then(articles => {
-      const commentCount = articles.map(article => {
+      const commentCountArray = articles.map(article => {
         return Comment.find({})
           .where("belongs_to")
           .eq(article._id)
           .count();
       });
-      return Promise.all([articles, ...commentCount]);
+      return Promise.all([articles, ...commentCountArray]);
     })
     .then(([articles, ...commentCountArray]) => {
-      const articlesWithComments = articles.map((article, index) => {
+      const articlesWithCommentCount = articles.map((article, index) => {
         return { ...article, comments: commentCountArray[index] };
       });
-      res.status(200).json({ articles: articlesWithComments });
+      res.status(200).json({ articles: articlesWithCommentCount });
     })
     .catch(next);
 };
@@ -25,7 +25,7 @@ const getAllArticles = (req, res, next) => {
 const articleById = (req, res, next) => {
   const { article_id } = req.params;
   const changeVote = req.query.vote;
-  Comment.find({})
+  return Comment.find({})
     .where("belongs_to")
     .eq(article_id)
     .count()
@@ -37,7 +37,7 @@ const articleById = (req, res, next) => {
           if (article === null) {
             next({
               status: 404,
-              message: `Page not found for ${article_id}`
+              message: `Article ${article_id} does not exist`
             });
           }
           if (article !== null) {
@@ -69,7 +69,7 @@ const getAllCommentsForSingleArticle = (req, res, next) => {
       comments.length === 0
         ? next({
             status: 404,
-            message: `Page not found for ${req.params.article_id}`
+            message: `Article ${req.params.article_id} does not exist`
           })
         : res.status(200).json({ comments });
     })
@@ -95,7 +95,7 @@ const addCommentToArticle = (req, res, next) => {
       } else {
         next({
           status: 404,
-          message: `Page not found for ${req.params.article_id}`
+          message: `Article ${req.params.article_id} does not exist`
         });
       }
     })

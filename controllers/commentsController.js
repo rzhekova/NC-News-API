@@ -9,7 +9,7 @@ const updateCommentByIdVote = (req, res, next) => {
       if (comment === null) {
         next({
           status: 404,
-          message: `Page not found for ${comment_id}`
+          message: `Comment ${comment_id} does not exist`
         });
       }
       if (changeVote === "up") {
@@ -34,7 +34,7 @@ const deleteCommentById = (req, res, next) => {
       } else {
         next({
           status: 404,
-          message: `Page not found for ${comment_id}`
+          message: `Comment ${comment_id} does not exist`
         });
       }
     })

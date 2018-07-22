@@ -1,7 +1,7 @@
-const { Article, Topic } = require("../models");
+const { Article, Topic, Comment } = require("../models");
 
 const getAllTopics = (req, res, next) => {
-  Topic.find({})
+  return Topic.find({})
     .then(topics => {
       res.status(200).json({ topics });
     })
@@ -12,15 +12,29 @@ const getArticlesByTopic = (req, res, next) => {
   return Article.find({})
     .where("belongs_to")
     .eq(req.params.topic_slug)
-    .populate({ path: "created_by", select: "username" })
+    .populate("created_by")
+    .lean()
     .then(articles => {
-      if (articles.length > 0) {
-        res.status(200).json({ articles });
-      } else
+      const commentCountArray = articles.map(article => {
+        return Comment.find({})
+          .where("belongs_to")
+          .eq(article._id)
+          .count();
+      });
+      return Promise.all([articles, ...commentCountArray]);
+    })
+    .then(([articles, ...commentCountArray]) => {
+      if (commentCountArray.length === 0) {
         next({
           status: 404,
-          message: `Page not found for ${req.params.topic_slug}`
+          message: `Topic ${req.params.topic_slug} does not exist`
         });
+      } else {
+        const articlesWithCommentCount = articles.map((article, index) => {
+          return { ...article, comments: commentCountArray[index] };
+        });
+        res.status(200).json({ articles: articlesWithCommentCount });
+      }
     })
     .catch(next);
 };
@@ -28,8 +42,7 @@ const getArticlesByTopic = (req, res, next) => {
 const addArticleToTopic = (req, res, next) => {
   const newArticle = new Article(req.body);
   newArticle["belongs_to"] = req.params.topic_slug;
-
-  Topic.find({})
+  return Topic.find({})
     .where("slug")
     .eq(req.params.topic_slug)
     .then(topic => {
@@ -42,7 +55,7 @@ const addArticleToTopic = (req, res, next) => {
       } else {
         next({
           status: 404,
-          message: `Page not found for ${req.params.topic_slug}`
+          message: `Topic ${req.params.topic_slug} does not exist`
         });
       }
     })

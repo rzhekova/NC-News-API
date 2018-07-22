@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const apiRouter = require("./routes/api.js");
 app.use(bodyParser.json());
+app.set("view engine", "ejs");
 
 const { DB_URL } =
   process.env.NODE_ENV === "production"
@@ -15,7 +16,7 @@ mongoose.connect(DB_URL).then(() => {
 });
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to NC News!" });
+  res.status(200).render("index.ejs");
 });
 
 app.use("/api", apiRouter);
@@ -32,14 +33,14 @@ app.use((err, req, res, next) => {
 // error handler for 400s/500s
 app.use((err, req, res, next) => {
   if (err.name === "CastError") {
-    res.status(400).json({ message: `Bad request : ${err.value} is invalid` });
-  }
-  if (err.name === "ValidationError") {
+    res
+      .status(400)
+      .json({ message: `Bad request : ${err.value} is not a valid ID` });
+  } else if (err.name === "ValidationError") {
     res
       .status(400)
       .json({ message: "Bad request : required fields are missing" });
-  }
-  res.status(500).json({ message: "Internal server error" });
+  } else res.status(500).json({ message: "Internal server error" });
 });
 
 module.exports = app;

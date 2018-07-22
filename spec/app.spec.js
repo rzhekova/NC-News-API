@@ -19,20 +19,15 @@ after(() => {
   return mongoose.disconnect();
 });
 describe("/", () => {
-  it("responds with 404 when a route is not found", () => {
+  it("GET responds with 200 when homepage is successfully reached", () => {
+    return request.get("/").expect(200);
+  });
+  it("GET responds with 404 when a route is not found", () => {
     return request
       .get("/animal")
       .expect(404)
       .then(res => {
         expect(res.body.message).to.equal("Page not found");
-      });
-  });
-  it("responds with 200 when a route is successfully reached", () => {
-    return request
-      .get("/")
-      .expect(200)
-      .then(res => {
-        expect(res.body.message).to.equal("Welcome to NC News!");
       });
   });
 });
@@ -67,17 +62,18 @@ describe("/api/topics", () => {
             articleDocs[0]._id.toString()
           );
           expect(res.body.articles.length).to.equal(2);
-          expect(res.body.articles[0]).to.contain.keys(
+          expect(res.body.articles[0]).to.have.all.keys(
             "_id",
             "title",
             "body",
             "created_by",
             "created_at",
             "belongs_to",
-            "votes"
+            "votes",
+            "comments",
+            "__v"
           );
         });
-      // fix to include comment count key/value pair
     });
     it("GET responds with 404 when topic slug is invalid", () => {
       const badTopicSlug = 4521;
@@ -86,7 +82,7 @@ describe("/api/topics", () => {
         .expect(404)
         .then(res => {
           expect(res.body.message).to.equal(
-            `Page not found for ${badTopicSlug}`
+            `Topic ${badTopicSlug} does not exist`
           );
         });
     });
@@ -139,7 +135,7 @@ describe("/api/topics", () => {
         .expect(404)
         .then(res => {
           expect(res.body.message).to.equal(
-            `Page not found for ${badTopicSlug}`
+            `Topic ${badTopicSlug} does not exist`
           );
         });
     });
@@ -158,7 +154,7 @@ describe("/api/articles", () => {
           expect(res.body.articles[0]._id).to.equal(
             articleDocs[0]._id.toString()
           );
-          expect(res.body.articles[0]).to.contain.keys(
+          expect(res.body.articles[0]).to.have.all.keys(
             "_id",
             "title",
             "votes",
@@ -166,7 +162,8 @@ describe("/api/articles", () => {
             "created_by",
             "belongs_to",
             "created_at",
-            "__v"
+            "__v",
+            "comments"
           );
         });
     });
@@ -179,7 +176,7 @@ describe("/api/articles", () => {
         .expect(200)
         .then(res => {
           expect(res.body.article).to.be.an("object");
-          expect(res.body.article).to.contain.keys(
+          expect(res.body.article).to.have.all.keys(
             "_id",
             "title",
             "votes",
@@ -187,7 +184,8 @@ describe("/api/articles", () => {
             "created_by",
             "belongs_to",
             "created_at",
-            "__v"
+            "__v",
+            "comments"
           );
         });
     });
@@ -198,17 +196,17 @@ describe("/api/articles", () => {
         .expect(400)
         .then(res => {
           expect(res.body.message).to.equal(
-            `Bad request : ${wrongFormatId} is invalid`
+            `Bad request : ${wrongFormatId} is not a valid ID`
           );
         });
     });
-    it("GET responds with 404 when id is in right format but incorrect", () => {
+    it("GET responds with 404 when article id is in right format but incorrect", () => {
       const badId = userDocs[0]._id;
       return request
         .get(`/api/articles/${badId}`)
         .expect(404)
         .then(res => {
-          expect(res.body.message).to.equal(`Page not found for ${badId}`);
+          expect(res.body.message).to.equal(`Article ${badId} does not exist`);
         });
     });
     it("PUT responds with 202 and returns the updated article", () => {
@@ -227,7 +225,7 @@ describe("/api/articles", () => {
         .expect(400)
         .then(res => {
           expect(res.body.message).to.equal(
-            `Bad request : ${wrongFormatId} is invalid`
+            `Bad request : ${wrongFormatId} is not a valid ID`
           );
         });
     });
@@ -237,7 +235,7 @@ describe("/api/articles", () => {
         .put(`/api/articles/${badId}?vote=down`)
         .expect(404)
         .then(res => {
-          expect(res.body.message).to.equal(`Page not found for ${badId}`);
+          expect(res.body.message).to.equal(`Article ${badId} does not exist`);
         });
     });
   });
@@ -249,12 +247,14 @@ describe("/api/articles", () => {
         .expect(200)
         .then(res => {
           expect(res.body.comments.length).to.equal(2);
-          expect(res.body.comments[0]).that.contain.keys(
+          expect(res.body.comments[0]).that.have.all.keys(
             "belongs_to",
             "votes",
+            "created_by",
             "body",
             "created_at",
-            "_id"
+            "_id",
+            "__v"
           );
         });
     });
@@ -265,17 +265,17 @@ describe("/api/articles", () => {
         .expect(400)
         .then(res => {
           expect(res.body.message).to.equal(
-            `Bad request : ${wrongFormatId} is invalid`
+            `Bad request : ${wrongFormatId} is not a valid ID`
           );
         });
     });
-    it("GET responds with 404 when id is in right format but incorrect", () => {
+    it("GET responds with 404 when article id is in right format but incorrect", () => {
       const badId = userDocs[0]._id;
       return request
         .get(`/api/articles/${badId}/comments`)
         .expect(404)
         .then(res => {
-          expect(res.body.message).to.equal(`Page not found for ${badId}`);
+          expect(res.body.message).to.equal(`Article ${badId} does not exist`);
         });
     });
     it("POST responds with 201 and returns added comment", () => {
@@ -290,12 +290,14 @@ describe("/api/articles", () => {
         .expect(201)
         .then(res => {
           expect(res.body).to.be.an("object");
-          expect(res.body).to.contain.keys(
-            "_id",
-            "body",
+          expect(res.body).to.have.all.keys(
             "belongs_to",
+            "votes",
             "created_by",
-            "votes"
+            "body",
+            "created_at",
+            "_id",
+            "__v"
           );
         });
     });
@@ -322,9 +324,7 @@ describe("/api/articles", () => {
         .send(newComment)
         .expect(404)
         .then(res => {
-          expect(res.body.message).to.equal(
-            `Page not found for ${userDocs[0]._id}`
-          );
+          expect(res.body.message).to.equal(`Article ${badId} does not exist`);
         });
     });
   });
@@ -347,17 +347,17 @@ describe("/api/comments/:comment_id", () => {
       .expect(400)
       .then(res => {
         expect(res.body.message).to.equal(
-          `Bad request : ${wrongFormatId} is invalid`
+          `Bad request : ${wrongFormatId} is not a valid ID`
         );
       });
   });
-  it("PUT responds with 404 when comment_id is incorrect but in right format", () => {
+  it("PUT responds with 404 when comment_id is in right format but incorrecr", () => {
     const badId = userDocs[0]._id;
     return request
       .put(`/api/comments/${badId}?vote=down`)
       .expect(404)
       .then(res => {
-        expect(res.body.message).to.equal(`Page not found for ${badId}`);
+        expect(res.body.message).to.equal(`Comment ${badId} does not exist`);
       });
   });
   it("DELETE responds with 202 and returns a message", () => {
@@ -378,7 +378,7 @@ describe("/api/comments/:comment_id", () => {
       .expect(400)
       .then(res => {
         expect(res.body.message).to.equal(
-          `Bad request : ${wrongFormatId} is invalid`
+          `Bad request : ${wrongFormatId} is not a valid ID`
         );
       });
   });
@@ -388,7 +388,7 @@ describe("/api/comments/:comment_id", () => {
       .delete(`/api/comments/${badId}`)
       .expect(404)
       .then(res => {
-        expect(res.body.message).to.equal(`Page not found for ${badId}`);
+        expect(res.body.message).to.equal(`Comment ${badId} does not exist`);
       });
   });
 });
@@ -401,7 +401,7 @@ describe("/api/users/:username", () => {
       .expect(200)
       .then(res => {
         expect(res.body).to.be.an("object");
-        expect(res.body).to.contain.keys(
+        expect(res.body).to.have.all.keys(
           "_id",
           "name",
           "username",
