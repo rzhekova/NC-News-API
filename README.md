@@ -45,6 +45,7 @@ npm i chai mocha supertest nodemon -D
 ### Running the tests
 
 In the package.json file, you'll find a list of scripts that make it easier to run certain commands.
+
 `npm test`
 or just `npm t` will run your Mocha tests.
 
