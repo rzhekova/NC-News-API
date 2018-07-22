@@ -1,9 +1,10 @@
-process.env.NODE_ENV = "dev";
+process.env.NODE_ENV = process.env.NODE_ENV || "dev";
 
 const seedDB = require("./seed.js");
-const mongoose = require("mongoose");
 const rawData = require("./devData");
-const DB_URL = "mongodb://localhost:27017/nc_news";
+const mongoose = require("mongoose");
+
+const { DB_URL } = require("../config/config");
 
 mongoose
   .connect(DB_URL)
