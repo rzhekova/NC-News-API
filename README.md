@@ -1,5 +1,7 @@
 ## Northcoders News API
 
+---
+
 ### Background
 
 The NC News API is an easy-to-use REST API which which allows you to search and retrieve JSON metadata for a number of topics, articles, users, and comments.
@@ -9,6 +11,8 @@ Follow this link to the API hosted on heroku: [NC NEWS API](https://rosies-ncnew
 ### Prerequisites
 
 - MongoDB - [Install MongoDB Community Edition — MongoDB Manual](https://docs.mongodb.com/manual/administration/install-community/)
+- Node.js (v. 9.11.1 and above) - [Installing Node.js Tutorial: Using nvm on macOS and Ubuntu](https://nodesource.com/blog/installing-node-js-tutorial-using-nvm-on-mac-os-x-and-ubuntu/)
+- NPM (v. 6.1.0 and above) - gets installed with Node
 
 ### Installation
 
@@ -18,25 +22,12 @@ Fork this repository and clone it onto your computer using the following termina
 git clone <repo url>
 ```
 
-Then, `cd` into the API directory as you will then also need to install a few Node packages.
-
-```
-npm i body-parser ejs express mongoose
-```
-
-Run this command to install all four of these libraries at the same time.
+Then, `cd` into the API directory and run`npm install`, or `npm i` for short, in you terminal to install all modules listed in the package.json. This will make the following packages available to your code:
 
 - Body-parser (v. 1.18.3) - used to process POST requests.
 - Express (v. 4.16.3) - used to set up your server and routers.
 - Mongoose (v. 5.2.4) - a MongoDB library that you may find extremely useful when seeding raw data into your database.
 - EJS (v. 4.16.3) - helps to embed JS finctionality into HTML files.
-
-Apart from the above mentioned packages, you will also need a few devDependencies which will be used for testing purposes. Run the command below which will save then under devDependencies in the package.json file:
-
-```
-npm i chai mocha supertest nodemon -D
-```
-
 - Chai (v. 4.1.2) - a BDD/TDD assertion library for node and the browser.
 - Mocha (v. 5.2.0) - a super easy to use test-suite framework.
 - Supertest (v. 3.1.0 and above) - a SuperAgent-driven library for testing HTTP servers which "listens" for you so you an carry out tests on your controllers
@@ -46,16 +37,17 @@ npm i chai mocha supertest nodemon -D
 
 In the package.json file, you'll find a list of scripts that make it easier to run certain commands.
 
+`npm run seed:dev`
+It is important to run this command first in order to seed your database with the raw data provided before using any of the other scripts.
+
 `npm test`
-or just `npm t` will run your Mocha tests.
+or just `npm t` will run your Mocha tests and will also seed the test data provided into a test database.
 
 `npm run start`
 This script will execute the command `node index.js` (index.js should contain your server listening functionality e.g. `app.listen()`). This, however, won't be needed during development and testing but will be needed for the production phase e.g. if you want to push your code onto Heroku.
-`npm run dev`
-This script will execute the command `nodemon index.js` which is perfect for when using e.g. [Postman](https://www.getpostman.com/) to test out various server requests.
 
-`npm run seed:dev`
-Run this in order to seed your database with the raw data provided
+`npm run dev`
+This script will execute the command `nodemon index.js` which is perfect for when you are using e.g. [Postman](https://www.getpostman.com/) to test out various server requests.
 
 ### Setting up your config file
 
@@ -63,9 +55,11 @@ In the root of the API directory, create a config directory using `mkdir config`
 
 Your config file will contain sensitive information e.g. your Mlab database username and password, and so it is important that you include it in your .gitignore file.
 
-The config object should look something like this:
+The config file should look something like this:
 
 ```js
+process.env.NODE_ENV = process.env.NODE_ENV || "dev";
+
 const config = {
   dev: { DB_URL: "mongodb://localhost:27017/<database>" },
   test: { DB_URL: "mongodb://localhost:27017/<test_database>" },
@@ -73,6 +67,8 @@ const config = {
     DB_URL: "mongodb://<dbusername>:<dbpassword>@<host>:<port>/<database>"
   }
 };
+
+module.exports = config[process.env.NODE_ENV];
 ```
 
 ### API Endpoints
@@ -157,5 +153,7 @@ Returns a JSON object with the profile data for the specified user.
 
 ### Hosting
 
-- Creating a Heroku remote and deploying - [Deploying with Git | Heroku Dev Center](https://devcenter.heroku.com/articles/git)
+Before pushing your app onto Heroku, ensure you have set up your database on Mlab.
+
 - Mlab - [Setting up a free MongoDB database on mLab and connecting to it with Node.js](http://fredrik.anderzon.se/2017/01/17/setting-up-a-free-mongodb-database-on-mlab-and-connecting-to-it-with-node-js/)
+- Creating a Heroku remote and deploying - [Deploying with Git | Heroku Dev Center](https://devcenter.heroku.com/articles/git)
