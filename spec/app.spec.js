@@ -351,7 +351,7 @@ describe("/api/comments/:comment_id", () => {
         );
       });
   });
-  it("PUT responds with 404 when comment_id is in right format but incorrecr", () => {
+  it("PUT responds with 404 when comment_id is in right format but incorrect", () => {
     const badId = userDocs[0]._id;
     return request
       .put(`/api/comments/${badId}?vote=down`)

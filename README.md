@@ -22,7 +22,7 @@ Fork this repository and clone it onto your computer using the following termina
 git clone <repo url>
 ```
 
-Then, `cd` into the API directory and run`npm install`, or `npm i` for short, in you terminal to install all modules listed in the package.json. This will make the following packages available to your code:
+Then, `cd` into the API directory and run `npm install`, or `npm i` for short, in you terminal to install all modules listed in the package.json. This will make the following packages available to your code:
 
 - Body-parser (v. 1.18.3) - used to process POST requests.
 - Express (v. 4.16.3) - used to set up your server and routers.
@@ -38,7 +38,7 @@ Then, `cd` into the API directory and run`npm install`, or `npm i` for short, in
 In the package.json file, you'll find a list of scripts that make it easier to run certain commands.
 
 `npm run seed:dev`
-It is important to run this command first in order to seed your database with the raw data provided before using any of the other scripts.
+It is important to run this command first in order to seed your database with the raw data provided before using any of the other scripts. Mongod would have to be running in the background prior to seeding (i.e. type `mongod` in the command line before `npm run seed:dev`).
 
 `npm test`
 or just `npm t` will run your Mocha tests and will also seed the test data provided into a test database.

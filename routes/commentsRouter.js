@@ -1,6 +1,6 @@
 const commentsRouter = require("express").Router();
 const {
-  updateCommentByIdVote,
+  updateCommentVote,
   deleteCommentById
 } = require("../controllers/commentsController.js");
 
@@ -9,7 +9,7 @@ commentsRouter.get("/", (req, res) => {
 });
 commentsRouter
   .route("/:comment_id")
-  .put(updateCommentByIdVote)
+  .put(updateCommentVote)
   .delete(deleteCommentById);
 
 module.exports = commentsRouter;

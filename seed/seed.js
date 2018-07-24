@@ -11,10 +11,10 @@ const seedDB = ({ topicData, commentData, userData, articleData }) => {
   return mongoose.connection
     .dropDatabase()
     .then(() => {
-      return Topic.insertMany(topicData);
-    })
-    .then(topicDocs => {
-      return Promise.all([topicDocs, User.insertMany(userData)]);
+      return Promise.all([
+        Topic.insertMany(topicData),
+        User.insertMany(userData)
+      ]);
     })
     .then(([topicDocs, userDocs]) => {
       const topicReference = createRef(topicData, "slug", topicDocs);

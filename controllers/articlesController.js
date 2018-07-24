@@ -9,7 +9,7 @@ const getAllArticles = (req, res, next) => {
         return Comment.find({})
           .where("belongs_to")
           .eq(article._id)
-          .count();
+          .countDocuments();
       });
       return Promise.all([articles, ...commentCountArray]);
     })
@@ -24,11 +24,10 @@ const getAllArticles = (req, res, next) => {
 
 const articleById = (req, res, next) => {
   const { article_id } = req.params;
-  const changeVote = req.query.vote;
   return Comment.find({})
     .where("belongs_to")
     .eq(article_id)
-    .count()
+    .countDocuments()
     .then(commentCount => {
       Article.findById(article_id)
         .populate("created_by")
@@ -42,19 +41,9 @@ const articleById = (req, res, next) => {
           }
           if (article !== null) {
             article["comments"] = commentCount;
-            const voteBefore = article.votes;
-            if (changeVote === "up") {
-              article.votes++;
-            } else if (changeVote === "down") {
-              article.votes--;
-            }
-            article.votes - voteBefore === 1 ||
-            article.votes - voteBefore === -1
-              ? res.status(202).json({ article })
-              : res.status(200).json({ article });
+            res.status(200).json({ article });
           }
-        })
-        .catch(next);
+        });
     })
     .catch(next);
 };
@@ -85,13 +74,11 @@ const addCommentToArticle = (req, res, next) => {
     .populate("created_by")
     .then(article => {
       if (article) {
-        return Comment.create(newComment)
-          .then(comment => {
-            return Comment.findById(comment._id)
-              .populate("created_by")
-              .then(comment => res.status(201).json(comment));
-          })
-          .catch(next);
+        return Comment.create(newComment).then(comment => {
+          return Comment.findById(comment._id)
+            .populate("created_by")
+            .then(comment => res.status(201).json(comment));
+        });
       } else {
         next({
           status: 404,
@@ -102,9 +89,51 @@ const addCommentToArticle = (req, res, next) => {
     .catch(next);
 };
 
+const changeArticleVote = (req, res, next) => {
+  const { article_id } = req.params;
+  const changeVote = req.query.vote;
+  if (changeVote === "up") {
+    return Article.findByIdAndUpdate(
+      article_id,
+      { $inc: { votes: 1 } },
+      { new: true }
+    )
+      .populate("created_by")
+      .lean()
+      .then(article => {
+        article === null
+          ? next({
+              status: 404,
+              message: `Article ${req.params.article_id} does not exist`
+            })
+          : res.status(202).json({ article });
+      })
+      .catch(next);
+  }
+  if (changeVote === "down") {
+    return Article.findByIdAndUpdate(
+      article_id,
+      { $inc: { votes: -1 } },
+      { new: true }
+    )
+      .populate("created_by")
+      .lean()
+      .then(article => {
+        article === null
+          ? next({
+              status: 404,
+              message: `Article ${req.params.article_id} does not exist`
+            })
+          : res.status(202).json({ article });
+      })
+      .catch(next);
+  }
+};
+
 module.exports = {
   getAllArticles,
   articleById,
   getAllCommentsForSingleArticle,
-  addCommentToArticle
+  addCommentToArticle,
+  changeArticleVote
 };

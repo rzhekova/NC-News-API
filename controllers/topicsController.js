@@ -19,7 +19,7 @@ const getArticlesByTopic = (req, res, next) => {
         return Comment.find({})
           .where("belongs_to")
           .eq(article._id)
-          .count();
+          .countDocuments();
       });
       return Promise.all([articles, ...commentCountArray]);
     })
@@ -47,11 +47,9 @@ const addArticleToTopic = (req, res, next) => {
     .eq(req.params.topic_slug)
     .then(topic => {
       if (topic[0]) {
-        return Article.create(newArticle)
-          .then(article => {
-            res.status(201).json({ article });
-          })
-          .catch(next);
+        return Article.create(newArticle).then(article => {
+          res.status(201).json({ article });
+        });
       } else {
         next({
           status: 404,

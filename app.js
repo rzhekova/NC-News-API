@@ -11,9 +11,14 @@ const { DB_URL } =
     ? process.env
     : require("./config/config.js");
 
-mongoose.connect(DB_URL).then(() => {
-  console.log(`Connected to ${DB_URL}`);
-});
+mongoose
+  .connect(
+    DB_URL,
+    { useNewUrlParser: true }
+  )
+  .then(() => {
+    console.log(`Connected to ${DB_URL}`);
+  });
 
 app.get("/", (req, res) => {
   res.status(200).render("index.ejs");

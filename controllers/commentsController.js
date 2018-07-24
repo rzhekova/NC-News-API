@@ -1,25 +1,44 @@
 const { Comment } = require("../models");
 
-const updateCommentByIdVote = (req, res, next) => {
+const updateCommentVote = (req, res, next) => {
   const { comment_id } = req.params;
   const changeVote = req.query.vote;
-  return Comment.findByIdAndUpdate(comment_id)
-    .populate("created_by")
-    .then(comment => {
-      if (comment === null) {
-        next({
-          status: 404,
-          message: `Comment ${comment_id} does not exist`
-        });
-      }
-      if (changeVote === "up") {
-        comment.votes++;
-      } else if (changeVote === "down") {
-        comment.votes--;
-      }
-      res.status(202).json({ comment });
-    })
-    .catch(next);
+  if (changeVote === "up") {
+    return Comment.findByIdAndUpdate(
+      comment_id,
+      { $inc: { votes: 1 } },
+      { new: true }
+    )
+      .populate("created_by")
+      .lean()
+      .then(comment => {
+        comment === null
+          ? next({
+              status: 404,
+              message: `Comment ${comment_id} does not exist`
+            })
+          : res.status(202).json({ comment });
+      })
+      .catch(next);
+  }
+  if (changeVote === "down") {
+    return Comment.findByIdAndUpdate(
+      comment_id,
+      { $inc: { votes: -1 } },
+      { new: true }
+    )
+      .populate("created_by")
+      .lean()
+      .then(comment => {
+        comment === null
+          ? next({
+              status: 404,
+              message: `Comment ${comment_id} does not exist`
+            })
+          : res.status(202).json({ comment });
+      })
+      .catch(next);
+  }
 };
 
 const deleteCommentById = (req, res, next) => {
@@ -41,4 +60,4 @@ const deleteCommentById = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { updateCommentByIdVote, deleteCommentById };
+module.exports = { updateCommentVote, deleteCommentById };
