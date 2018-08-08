@@ -3,6 +3,8 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const apiRouter = require("./routes/api.js");
+const cors = require("cors");
+app.use(cors());
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
 
