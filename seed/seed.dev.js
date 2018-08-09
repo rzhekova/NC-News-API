@@ -7,7 +7,10 @@ const mongoose = require("mongoose");
 const { DB_URL } = require("../config/config");
 
 mongoose
-  .connect(DB_URL)
+  .connect(
+    DB_URL,
+    { useNewUrlParser: true }
+  )
   .then(() => {
     console.log(`Connected to ${DB_URL}........`);
   })
