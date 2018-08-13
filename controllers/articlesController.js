@@ -49,18 +49,24 @@ const articleById = (req, res, next) => {
 };
 
 const getAllCommentsForSingleArticle = (req, res, next) => {
-  return Comment.find({})
-    .where("belongs_to")
-    .eq(req.params.article_id)
+  const { article_id } = req.params;
+  Article.findById(article_id)
     .populate("created_by")
-    .populate("belongs_to")
-    .then(comments => {
-      comments.length === 0
-        ? next({
-            status: 404,
-            message: `Article ${req.params.article_id} does not exist`
-          })
-        : res.status(200).json({ comments });
+    .then(article => {
+      if (!article) {
+        next({
+          status: 404,
+          message: `Article ${article_id} does not exist`
+        });
+      } else
+        return Comment.find({})
+          .where("belongs_to")
+          .eq(article._id)
+          .populate("created_by")
+          .populate("belongs_to")
+          .then(comments => {
+            res.status(200).json({ comments });
+          });
     })
     .catch(next);
 };
