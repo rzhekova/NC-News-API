@@ -5,6 +5,7 @@
 The NC News API is an easy-to-use REST API which which allows you to search and retrieve JSON metadata for a number of topics, articles, users, and comments.
 
 Follow this link to the API hosted on heroku: [NC NEWS API](https://rosies-ncnews.herokuapp.com/)
+
 Link to Front End project: [NC NEWS FE](https://github.com/rzhekova/NC-News-FE)
 
 ### Prerequisites
