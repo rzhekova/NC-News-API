@@ -393,6 +393,26 @@ describe("/api/comments/:comment_id", () => {
   });
 });
 
+describe.only("/api/users", () => {
+  it("GET responds with 200 and returns an array of users", () => {
+    return request
+      .get("/api/users")
+      .expect(200)
+      .then(res => {
+        expect(res.body.users[0]).to.be.an("object");
+        expect(res.body.users.length).to.equal(2);
+        expect(res.body.users[0]._id).to.equal(userDocs[0]._id.toString());
+        expect(res.body.users[0]).to.have.all.keys(
+          "_id",
+          "avatar_url",
+          "username",
+          "name",
+          "__v"
+        );
+      });
+  });
+});
+
 describe("/api/users/:username", () => {
   it("GET responds with 200 and returns user data", () => {
     const username = userDocs[0].username;

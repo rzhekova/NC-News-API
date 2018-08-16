@@ -11,4 +11,10 @@ const getUserByUsername = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = getUserByUsername;
+const getAllUsers = (req, res, next) => {
+  return User.find({})
+    .then(users => res.status(200).json({ users }))
+    .catch(next);
+};
+
+module.exports = { getUserByUsername, getAllUsers };

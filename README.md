@@ -144,6 +144,12 @@ DELETE /api/comments/:comment_id
 Deletes a comment
 
 ```http
+GET /api/users
+```
+
+Returns all users
+
+```http
 GET /api/users/:username
 ```
 
