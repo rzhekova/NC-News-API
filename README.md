@@ -1,7 +1,5 @@
 ## Northcoders News API
 
----
-
 ### Background
 
 The NC News API is an easy-to-use REST API which which allows you to search and retrieve JSON metadata for a number of topics, articles, users, and comments.
